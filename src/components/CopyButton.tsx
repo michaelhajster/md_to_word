@@ -20,36 +20,12 @@ const CopyButton: React.FC<CopyButtonProps> = ({
     if (!contentToCopy) return;
 
     try {
-      // Process the HTML for better Word compatibility
+      // Process the HTML for better Word compatibility using the enhanced function
       const processedHtml = prepareHtmlForClipboard(contentToCopy, useGermanStyle);
-      
-      // Add additional academic formatting for blockquotes and conclusions
-      const enhancedHtml = processedHtml
-        // Ensure proper styling for blockquotes (conclusions)
-        .replace(/<blockquote[^>]*>/g, (match) => {
-          if (useGermanStyle) {
-            return '<blockquote style="border-left: 3px solid #666; padding-left: 10px; margin-left: 20px; font-style: italic; color: #000000;">';
-          }
-          return '<blockquote style="border-left: 3px solid #666; padding-left: 10px; margin-left: 20px; color: #000000;">';
-        })
-        // Ensure proper styling for strong/bold text
-        .replace(/<(strong|b)[^>]*>/g, (match, tag) => {
-          if (useGermanStyle) {
-            return `<${tag} style="font-weight: bold; font-family: Palatino Linotype, serif;">`;
-          }
-          return `<${tag} style="font-weight: bold;">`;
-        })
-        // Ensure proper styling for emphasis/italic text
-        .replace(/<(em|i)[^>]*>/g, (match, tag) => {
-          if (useGermanStyle) {
-            return `<${tag} style="font-style: italic; font-family: Palatino Linotype, serif;">`;
-          }
-          return `<${tag} style="font-style: italic;">`;
-        });
       
       // Create a temporary element to hold the HTML
       const tempElement = document.createElement("div");
-      tempElement.innerHTML = enhancedHtml;
+      tempElement.innerHTML = processedHtml;
       document.body.appendChild(tempElement);
       
       // Select the content
