@@ -10,3 +10,4 @@
 - Fixed application to work on localhost:3001 by updating NEXTAUTH_URL, improving HTML to DOCX conversion, and configuring Next.js to run on port 3001.
 - Fixed Word formatting issues by improving HTML to clipboard conversion, ensuring proper text color and formatting when pasting into Word, and enhancing DOCX generation.
 - Added German typography options with specific formatting for academic documents: Palatino Linotype 11pt for body text, Calibri 12pt for headings, justified text alignment, and proper page margins (3cm top/left/bottom, 2.5cm right).
+- Enhanced academic thesis formatting with improved handling of blockquotes, conclusion sections, and nested elements, ensuring proper formatting when converting complex academic content to Word format.
