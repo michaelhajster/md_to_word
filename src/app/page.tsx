@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MarkdownInput from "@/components/MarkdownInput";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import CopyButton from "@/components/CopyButton";
@@ -16,6 +16,15 @@ export default function Home() {
   const [fontSize, setFontSize] = useState("16px");
   const [fontFamily, setFontFamily] = useState("Arial, sans-serif");
   const [lineHeight, setLineHeight] = useState("1.5");
+
+  // Configure marked options for Word-friendly HTML
+  useEffect(() => {
+    marked.setOptions({
+      gfm: true, // GitHub Flavored Markdown
+      breaks: true, // Convert line breaks to <br>
+      pedantic: false, // Don't be too strict
+    });
+  }, []);
 
   // Update HTML when markdown changes
   const handleMarkdownChange = (value: string) => {

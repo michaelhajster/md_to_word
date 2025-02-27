@@ -6,3 +6,6 @@
 - Fixed dynamic route warning by adding force-dynamic config to root page
 - Added Storybook with Button component and stories, updated .cursorrules with Storybook guidelines
 - Captured screenshot of Button component stories in Storybook
+- Implemented a Markdown to Word converter application with real-time preview, styling options, and DOCX download functionality.
+- Fixed application to work on localhost:3001 by updating NEXTAUTH_URL, improving HTML to DOCX conversion, and configuring Next.js to run on port 3001.
+- Fixed Word formatting issues by improving HTML to clipboard conversion, ensuring proper text color and formatting when pasting into Word, and enhancing DOCX generation.
