@@ -16,6 +16,8 @@ export default function Home() {
   const [fontSize, setFontSize] = useState("16px");
   const [fontFamily, setFontFamily] = useState("Arial, sans-serif");
   const [lineHeight, setLineHeight] = useState("1.5");
+  const [textAlign, setTextAlign] = useState("left");
+  const [useGermanStyle, setUseGermanStyle] = useState(false);
 
   // Configure marked options for Word-friendly HTML
   useEffect(() => {
@@ -66,9 +68,13 @@ export default function Home() {
                 fontSize={fontSize}
                 fontFamily={fontFamily}
                 lineHeight={lineHeight}
+                textAlign={textAlign}
+                useGermanStyle={useGermanStyle}
                 onFontSizeChange={setFontSize}
                 onFontFamilyChange={setFontFamily}
                 onLineHeightChange={setLineHeight}
+                onTextAlignChange={setTextAlign}
+                onUseGermanStyleChange={setUseGermanStyle}
               />
             </div>
 
@@ -79,8 +85,8 @@ export default function Home() {
                   Preview
                 </h2>
                 <div className="flex space-x-2">
-                  <DownloadButton html={html} title="Markdown Document" />
-                  <CopyButton contentToCopy={html} />
+                  <DownloadButton html={html} title="Markdown Document" useGermanStyle={useGermanStyle} />
+                  <CopyButton contentToCopy={html} useGermanStyle={useGermanStyle} />
                 </div>
               </div>
               <MarkdownPreview 
@@ -88,6 +94,8 @@ export default function Home() {
                 fontSize={fontSize}
                 fontFamily={fontFamily}
                 lineHeight={lineHeight}
+                textAlign={textAlign}
+                useGermanStyle={useGermanStyle}
               />
             </div>
           </div>

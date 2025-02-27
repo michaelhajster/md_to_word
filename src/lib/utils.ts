@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Function to convert HTML to a format better suited for Word pasting
-export function prepareHtmlForClipboard(html: string): string {
+export function prepareHtmlForClipboard(html: string, useGermanStyle: boolean = false): string {
   // Create a temporary DOM element
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = html;
@@ -33,16 +33,42 @@ export function prepareHtmlForClipboard(html: string): string {
       // Remove any background colors
       el.style.backgroundColor = 'transparent';
       
-      // Ensure proper spacing
-      if (el.tagName === 'P') {
-        el.style.marginBottom = '1em';
-      }
-      
-      // Improve heading styles
-      if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(el.tagName)) {
-        el.style.fontWeight = 'bold';
-        el.style.marginTop = '1em';
-        el.style.marginBottom = '0.5em';
+      // Apply German style if requested
+      if (useGermanStyle) {
+        // Set default font to Palatino Linotype, 11px
+        el.style.fontFamily = 'Palatino Linotype, serif';
+        el.style.fontSize = '11px';
+        el.style.lineHeight = '1.5';
+        
+        // Set text alignment to justify except for lists
+        if (!['UL', 'OL', 'LI'].includes(el.tagName)) {
+          el.style.textAlign = 'justify';
+        } else {
+          el.style.textAlign = 'left';
+        }
+        
+        // Set headings to Calibri, 12px
+        if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(el.tagName)) {
+          el.style.fontFamily = 'Calibri, sans-serif';
+          el.style.fontSize = '12px';
+        }
+        
+        // Set footnotes to 10px
+        if (el.classList.contains('footnote')) {
+          el.style.fontSize = '10px';
+        }
+      } else {
+        // Ensure proper spacing
+        if (el.tagName === 'P') {
+          el.style.marginBottom = '1em';
+        }
+        
+        // Improve heading styles
+        if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(el.tagName)) {
+          el.style.fontWeight = 'bold';
+          el.style.marginTop = '1em';
+          el.style.marginBottom = '0.5em';
+        }
       }
     }
   });
@@ -51,22 +77,46 @@ export function prepareHtmlForClipboard(html: string): string {
   return tempDiv.innerHTML;
 }
 
-export async function convertHtmlToDocx(html: string, title: string = "Document"): Promise<Blob> {
+export async function convertHtmlToDocx(
+  html: string, 
+  title: string = "Document", 
+  options: {
+    description?: string;
+    pageMargins?: {
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
+    }
+  } = {}
+): Promise<Blob> {
   // Create a temporary DOM element to parse the HTML
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
   
-  // Create a new document
-  const docxDoc = new Document({
+  // Default options
+  const docOptions = {
     title,
-    description: "Converted from Markdown",
+    description: options.description || "Converted from Markdown",
     sections: [
       {
-        properties: {},
+        properties: options.pageMargins ? {
+          page: {
+            margin: {
+              top: options.pageMargins.top,
+              right: options.pageMargins.right,
+              bottom: options.pageMargins.bottom,
+              left: options.pageMargins.left,
+            }
+          }
+        } : {},
         children: parseHtmlToDocxElements(doc.body, title),
       },
     ],
-  });
+  };
+
+  // Create a new document
+  const docxDoc = new Document(docOptions);
 
   // Generate the docx file
   return await Packer.toBlob(docxDoc);

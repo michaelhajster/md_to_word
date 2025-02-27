@@ -6,11 +6,13 @@ import { prepareHtmlForClipboard } from "@/lib/utils";
 interface CopyButtonProps {
   contentToCopy: string;
   className?: string;
+  useGermanStyle?: boolean;
 }
 
 const CopyButton: React.FC<CopyButtonProps> = ({
   contentToCopy,
   className = "",
+  useGermanStyle = false,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -19,7 +21,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({
 
     try {
       // Process the HTML for better Word compatibility
-      const processedHtml = prepareHtmlForClipboard(contentToCopy);
+      const processedHtml = prepareHtmlForClipboard(contentToCopy, useGermanStyle);
       
       // Create a temporary element to hold the HTML
       const tempElement = document.createElement("div");
