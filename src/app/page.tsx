@@ -1,84 +1,122 @@
-import React from "react";
-import ClientProvider from "@/components/ClientProvider";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+"use client";
 
-export const dynamic = "force-dynamic";
+import React, { useState } from "react";
+import MarkdownInput from "@/components/MarkdownInput";
+import MarkdownPreview from "@/components/MarkdownPreview";
+import CopyButton from "@/components/CopyButton";
+import StyleOptions from "@/components/StyleOptions";
+import DownloadButton from "@/components/DownloadButton";
+import { marked } from "marked";
 
-async function getSession() {
-  try {
-    const session = await getServerSession(authOptions);
-    return session;
-  } catch (error) {
-    console.error("Failed to get session:", error);
-    return null;
-  }
-}
+export default function Home() {
+  const [markdown, setMarkdown] = useState("");
+  const [html, setHtml] = useState("");
+  
+  // Style options state
+  const [fontSize, setFontSize] = useState("16px");
+  const [fontFamily, setFontFamily] = useState("Arial, sans-serif");
+  const [lineHeight, setLineHeight] = useState("1.5");
 
-export default async function Page() {
-  const session = await getSession();
+  // Update HTML when markdown changes
+  const handleMarkdownChange = (value: string) => {
+    setMarkdown(value);
+    try {
+      const parsedHtml = marked.parse(value || "") as string;
+      setHtml(parsedHtml);
+    } catch (error) {
+      console.error("Error parsing markdown:", error);
+      setHtml("<p>Error parsing markdown</p>");
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col relative">
-      {/* {session && <NavigationBar />} */}
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Markdown to Word Converter
+          </h1>
+        </div>
+      </header>
 
-      <main className="flex-1 flex flex-col w-full mx-auto">
-        <ClientProvider>
-          <div className="flex-1 flex items-start justify-center  bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-950">
-            {session ? (
-              // Authenticated View
-              <section className="max-w-7xl w-full space-y-8 animate-fade-in">
-                <h1> Welcome {session.user?.name}</h1>
-              </section>
-            ) : (
-              // Marketing View
-              <section className="max-w-7xl w-full space-y-8 animate-fade-in">
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-                  <h1 className="text-4xl font-bold mt-10">
-                    Welcome - Click the button below to get started
-                  </h1>
-                  <Link
-                    href="/auth/signin"
-                    className="group w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg px-8 py-4 text-lg font-medium shadow-lg shadow-blue-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30"
-                  >
-                    Get Started
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+      <main className="flex-1 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Input Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Markdown Input
+              </h2>
+              <MarkdownInput
+                value={markdown}
+                onChange={handleMarkdownChange}
+              />
+              
+              {/* Style Options */}
+              <StyleOptions 
+                fontSize={fontSize}
+                fontFamily={fontFamily}
+                lineHeight={lineHeight}
+                onFontSizeChange={setFontSize}
+                onFontFamilyChange={setFontFamily}
+                onLineHeightChange={setLineHeight}
+              />
+            </div>
+
+            {/* Preview Section - Takes 2 columns */}
+            <div className="space-y-4 lg:col-span-2">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Preview
+                </h2>
+                <div className="flex space-x-2">
+                  <DownloadButton html={html} title="Markdown Document" />
+                  <CopyButton contentToCopy={html} />
                 </div>
-              </section>
-            )}
+              </div>
+              <MarkdownPreview 
+                markdown={markdown} 
+                fontSize={fontSize}
+                fontFamily={fontFamily}
+                lineHeight={lineHeight}
+              />
+            </div>
           </div>
-        </ClientProvider>
+
+          {/* Instructions */}
+          <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              How to Use
+            </h2>
+            <ol className="list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <li>Enter or paste your Markdown content in the input area.</li>
+              <li>
+                Customize the appearance using the styling options.
+              </li>
+              <li>
+                The preview will show how it will look when pasted into Word.
+              </li>
+              <li>
+                Click the "Copy to Clipboard" button to copy the formatted
+                content, or use "Download as DOCX" to download a Word document.
+              </li>
+              <li>
+                If using copy, open Microsoft Word and paste (Ctrl+V or Cmd+V) the content.
+              </li>
+              <li>
+                The formatting from the Markdown should be preserved in Word.
+              </li>
+            </ol>
+          </div>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">
-            © {new Date().getFullYear()} All Rights Reserved
-          </span>
-          <div className="flex items-center gap-6 text-sm text-neutral-600 dark:text-neutral-400">
-            <Link
-              href="/privacy"
-              className="hover:text-blue-600 dark:hover:text-blue-400"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/terms"
-              className="hover:text-blue-600 dark:hover:text-blue-400"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              href="/contact"
-              className="hover:text-blue-600 dark:hover:text-blue-400"
-            >
-              Contact
-            </Link>
-          </div>
+      <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            © {new Date().getFullYear()} Markdown to Word Converter. All rights
+            reserved.
+          </p>
         </div>
       </footer>
     </div>
